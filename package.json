@@ -1,5 +1,5 @@
 {
-  "name": "aws-sqs",
+  "name": "aws-sqs-promises",
   "version": "0.0.1",
   "description": "simple pomise based interface to deal with aws-sqs",
   "main": "index.js",
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/ankitpatial/aws-sqs.git"
+    "url": "git://github.com/ankitpatial/aws-sqs-promises.git"
   },
   "keywords": [
     "aws",
