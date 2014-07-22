@@ -1,0 +1,29 @@
+{
+  "name": "aws-sqs",
+  "version": "0.0.1",
+  "description": "simple pomise based interface to deal with aws-sqs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ankitpatial/aws-sqs.git"
+  },
+  "keywords": [
+    "aws",
+    "aws-sqs",
+    "promises"
+  ],
+  "author": "Ankit Patial",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ankitpatial/aws-sqs/issues"
+  },
+  "homepage": "https://github.com/ankitpatial/aws-sqs",
+  "dependencies": {
+    "aws-sdk": "^2.0.8",
+    "bunyan": "^0.23.1",
+    "q": "^1.0.1"
+  }
+}
