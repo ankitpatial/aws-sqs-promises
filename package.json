@@ -1,6 +1,6 @@
 {
   "name": "aws-sqs-promises",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "simple pomise based interface to deal with aws-sqs",
   "main": "index.js",
   "scripts": {
@@ -25,5 +25,10 @@
     "aws-sdk": "^2.0.8",
     "bunyan": "^0.23.1",
     "q": "^1.0.1"
+  },
+  "devDependencies": {
+    "chai": "^1.9.1",
+    "mocha": "^1.21.3",
+    "sinon": "^1.10.3"
   }
 }
