@@ -1,6 +1,6 @@
 {
   "name": "aws-sqs-promises",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "simple pomise based interface to deal with aws-sqs",
   "main": "index.js",
   "scripts": {
