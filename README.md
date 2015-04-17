@@ -43,7 +43,11 @@ myQueue
 
 ### Change set
  Change list.
- 
+
+#### 0.1.0
+- moved method getQueueUrl from internal to public.
+- jslint
+- bumped version from 0.0.4, i think its be in good state now.
 #### 0.0.4
 - Add new option.useIAMRole(boolean) for production use , it will make use of EC2 instance IAM Role, if EC2 instance is not using role then it will fall back to shared credentials file (~/.aws/credentials)
 if is not configured then it will check for environment variables.

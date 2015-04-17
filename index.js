@@ -1,3 +1,4 @@
+'use strict';
 var AWS = require('aws-sdk'),
     Q = require('q'),
     assert = require('assert');
@@ -9,9 +10,7 @@ var logger = {
     error: function (msg, err) {
         console.error('[aws-sqs-promises] Error ', msg, err || '');
     }
-}
-
-module.exports = SimpleQueue;
+};
 
 /***
  * AWS Simple Queue
@@ -68,10 +67,12 @@ function SimpleQueue(options) {
         count: 0,
         isBusy: false,
         waitQueue: []
-    }
+    };
 }
 
-SimpleQueue.prototype._getQueueUrl = function () {
+module.exports = SimpleQueue;
+
+SimpleQueue.prototype.getQueueUrl = function () {
     var deferred = Q.defer(),
         self = this,
         handleRes = function (err, data) {
@@ -80,13 +81,13 @@ SimpleQueue.prototype._getQueueUrl = function () {
                 logger.error(errMsg);
                 self._getUrlState.waitQueue.forEach(function (df) {
                     df.reject(err);
-                })
+                });
 
             } else {
                 self.queueUrl = data.QueueUrl;
                 self._getUrlState.waitQueue.forEach(function (df) {
                     df.resolve(self.queueUrl);
-                })
+                });
             }
         };
 
@@ -107,7 +108,7 @@ SimpleQueue.prototype._getQueueUrl = function () {
     }
 
     return deferred.promise;
-}
+};
 
 SimpleQueue.prototype.getQueueAttributes = function () {
 
@@ -116,13 +117,13 @@ SimpleQueue.prototype.getQueueAttributes = function () {
 
     return Q.Promise(function (resolve, reject) {
 
-        self._getQueueUrl()
+        self.getQueueUrl()
             .then(function (queueUrl) {
 
                 var params = {
                     QueueUrl: queueUrl,
                     AttributeNames: [
-                        'MessageRetentionPeriod | ApproximateNumberOfMessages | ApproximateNumberOfMessagesNotVisible | QueueArn | ApproximateNumberOfMessagesDelayed | DelaySeconds | ReceiveMessageWaitTimeSeconds',
+                        'MessageRetentionPeriod | ApproximateNumberOfMessages | ApproximateNumberOfMessagesNotVisible | QueueArn | ApproximateNumberOfMessagesDelayed | DelaySeconds | ReceiveMessageWaitTimeSeconds'
                     ]
                 };
 
@@ -136,19 +137,19 @@ SimpleQueue.prototype.getQueueAttributes = function () {
             })
             .catch(reject);
     });
-}
+};
 
 SimpleQueue.prototype.sendMessage = function (msgData) {
     var self = this,
         sqs = self.client;
 
     return Q.Promise(function (resolve, reject) {
-        self._getQueueUrl()
+        self.getQueueUrl()
             .then(function (queueUrl) {
                 var params = {
                     QueueUrl: queueUrl,
                     MessageBody: JSON.stringify(msgData)
-                }
+                };
 
                 sqs.sendMessage(params, function (err, data) {
                     if (err) {
@@ -160,7 +161,7 @@ SimpleQueue.prototype.sendMessage = function (msgData) {
             })
             .catch(reject);
     });
-}
+};
 
 SimpleQueue.prototype.receiveMessage = function () {
     var self = this,
@@ -168,13 +169,13 @@ SimpleQueue.prototype.receiveMessage = function () {
 
 
     return Q.Promise(function (resolve, reject) {
-        self._getQueueUrl()
+        self.getQueueUrl()
             .then(function (queueUrl) {
                 var params = {
                     QueueUrl: queueUrl,
                     MaxNumberOfMessages: self.maxMessages,
                     WaitTimeSeconds: self.waitTimeSeconds
-                }
+                };
 
                 sqs.receiveMessage(params, function (err, data) {
                     if (err) {
@@ -186,28 +187,32 @@ SimpleQueue.prototype.receiveMessage = function () {
             })
             .catch(reject);
     });
-}
+};
 
-SimpleQueue.prototype.deleteMessage = function (receiptHandle) {
+var removeMsg = function (receiptHandle) {
     var self = this,
         sqs = self.client;
 
     return Q.Promise(function (resolve, reject) {
-        self._getQueueUrl()
+        self.getQueueUrl()
             .then(function (queueUrl) {
                 var params = {
                     QueueUrl: queueUrl,
                     ReceiptHandle: receiptHandle
-                }
+                };
 
                 sqs.deleteMessage(params, function (err, data) {
                     if (err) {
                         reject(err);
                     } else {
-                        resolve();
+                        resolve(data);
                     }
                 });
             })
             .catch(reject);
     });
-}
+};
+
+SimpleQueue.prototype.removeMessage = removeMsg;
+
+SimpleQueue.prototype.deleteMessage = removeMsg;
