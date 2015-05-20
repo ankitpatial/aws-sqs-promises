@@ -44,6 +44,11 @@ myQueue
 ### Change set
  Change list.
 
+#### 0.1.1
+- added new params delaySeconds
+ ```
+ myQueue.sendMessage(jsonOrStringData, delaySeconds)
+ ```
 #### 0.1.0
 - moved method getQueueUrl from internal to public.
 - jslint

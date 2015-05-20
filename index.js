@@ -37,7 +37,7 @@ function SimpleQueue(options) {
     options.maxMessages = options.maxMessages || 10;
 
     if (options.maxMessages < 0 || options.maxMessages > 10) {
-        logger.log('Queue options.maxMessages is out of range, setting default value 10');
+        logger.log('[aws-sqs-promises] Queue options.maxMessages is out of range, setting default value 10');
         options.maxMessages = 10;
     }
 
@@ -48,13 +48,12 @@ function SimpleQueue(options) {
 
 
     if (options.useIAMRole) {
-        logger.log('Create AWS.SQS , Use credentials from  IAMRole or Shared Credentials or Environment Variables');
+        logger.log('[aws-sqs-promises] Use IAMRole');
         this.client = new AWS.SQS({
             region: options.region || "us-east-1",
             apiVersion: options.apiVersion || '2012-11-05'
         });
     } else {
-        logger.log('Create AWS.SQS , with hard coded credendtials');
         this.client = new AWS.SQS({
             accessKeyId: options.accessKeyId,
             secretAccessKey: options.secretAccessKey,
@@ -77,7 +76,7 @@ SimpleQueue.prototype.getQueueUrl = function () {
         self = this,
         handleRes = function (err, data) {
             if (err) {
-                var errMsg = 'Code: ' + (err.code || 'N/A' ) + '. Message: ' + (err.message || err);
+                var errMsg = '[aws-sqs-promises] Code: ' + (err.code || 'N/A' ) + '. Message: ' + (err.message || err);
                 logger.error(errMsg);
                 self._getUrlState.waitQueue.forEach(function (df) {
                     df.reject(err);
@@ -139,7 +138,7 @@ SimpleQueue.prototype.getQueueAttributes = function () {
     });
 };
 
-SimpleQueue.prototype.sendMessage = function (msgData) {
+SimpleQueue.prototype.sendMessage = function (msgData, delaySeconds) {
     var self = this,
         sqs = self.client;
 
@@ -150,6 +149,10 @@ SimpleQueue.prototype.sendMessage = function (msgData) {
                     QueueUrl: queueUrl,
                     MessageBody: JSON.stringify(msgData)
                 };
+
+                if (delaySeconds) {
+                    params.DelaySeconds = delaySeconds;
+                }
 
                 sqs.sendMessage(params, function (err, data) {
                     if (err) {
