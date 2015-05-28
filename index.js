@@ -186,7 +186,7 @@ SimpleQueue.prototype.receiveMessage = function () {
                     if (err) {
                         reject(err);
                     } else {
-                        console.time(scriptName + 'receiveMessage');
+                        console.timeEnd(scriptName + 'receiveMessage');
                         resolve(data.Messages);
                     }
                 });
