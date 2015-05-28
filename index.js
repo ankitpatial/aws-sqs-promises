@@ -3,12 +3,14 @@ var AWS = require('aws-sdk'),
     Q = require('q'),
     assert = require('assert');
 
+var scriptName = '[aws-sqs-promises] ';
+
 var logger = {
     log: function (msg) {
-        console.log('[aws-sqs-promises] ', msg);
+        console.log(scriptName, msg);
     },
     error: function (msg, err) {
-        console.error('[aws-sqs-promises] Error ', msg, err || '');
+        console.error(scriptName, 'Error', msg, err || '');
     }
 };
 
@@ -37,7 +39,7 @@ function SimpleQueue(options) {
     options.maxMessages = options.maxMessages || 10;
 
     if (options.maxMessages < 0 || options.maxMessages > 10) {
-        logger.log('[aws-sqs-promises] Queue options.maxMessages is out of range, setting default value 10');
+        logger.log('Queue options.maxMessages is out of range, setting default value 10');
         options.maxMessages = 10;
     }
 
@@ -48,7 +50,7 @@ function SimpleQueue(options) {
 
 
     if (options.useIAMRole) {
-        logger.log('[aws-sqs-promises] Use IAMRole');
+        logger.log('Use IAMRole');
         this.client = new AWS.SQS({
             region: options.region || "us-east-1",
             apiVersion: options.apiVersion || '2012-11-05'
@@ -76,7 +78,7 @@ SimpleQueue.prototype.getQueueUrl = function () {
         self = this,
         handleRes = function (err, data) {
             if (err) {
-                var errMsg = '[aws-sqs-promises] Code: ' + (err.code || 'N/A' ) + '. Message: ' + (err.message || err);
+                var errMsg = 'Code: ' + (err.code || 'N/A' ) + '. Message: ' + (err.message || err);
                 logger.error(errMsg);
                 self._getUrlState.waitQueue.forEach(function (df) {
                     df.reject(err);
@@ -170,8 +172,8 @@ SimpleQueue.prototype.receiveMessage = function () {
     var self = this,
         sqs = self.client;
 
-
     return Q.Promise(function (resolve, reject) {
+        console.time(scriptName + 'receiveMessage');
         self.getQueueUrl()
             .then(function (queueUrl) {
                 var params = {
@@ -184,6 +186,7 @@ SimpleQueue.prototype.receiveMessage = function () {
                     if (err) {
                         reject(err);
                     } else {
+                        console.time(scriptName + 'receiveMessage');
                         resolve(data.Messages);
                     }
                 });
