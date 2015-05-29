@@ -47,6 +47,7 @@ function SimpleQueue(options) {
     this.maxMessages = options.maxMessages;
     this.queueUrl = "";
     this.waitTimeSeconds = 10;
+    this.requestTimeOut = 13;
 
 
     if (options.useIAMRole) {
@@ -150,7 +151,7 @@ SimpleQueue.prototype.receiveMessage = function () {
     var self = this,
         sqs = self.client;
 
-    return Q.Promise(function (resolve, reject) {
+    return Q.timeout(Q.Promise(function (resolve, reject) {
         console.time(scriptName + 'receiveMessage');
         self.getQueueUrl()
             .then(function (queueUrl) {
@@ -170,7 +171,7 @@ SimpleQueue.prototype.receiveMessage = function () {
                 });
             })
             .catch(reject);
-    });
+    }), 1000 * self.timeOutSeconds, 'request time out');
 };
 
 var removeMsg = function (receiptHandle) {

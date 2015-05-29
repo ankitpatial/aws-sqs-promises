@@ -44,6 +44,9 @@ myQueue
 ### Change set
  Change list.
 
+#### 0.1.5
+- added receive request timeout for 13 seconds`
+
 #### 0.1.4
 - code refactoring
 
