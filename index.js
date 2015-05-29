@@ -151,7 +151,7 @@ SimpleQueue.prototype.receiveMessage = function () {
     var self = this,
         sqs = self.client;
 
-    var reqPromise = Q.Promise(function (resolve, reject) {
+    return Q.Promise(function (resolve, reject) {
         self.getQueueUrl()
             .then(function (queueUrl) {
                 var params = {
@@ -170,12 +170,7 @@ SimpleQueue.prototype.receiveMessage = function () {
             })
             .catch(reject);
     });
-
-    Q.timeout(reqPromise, 1000 * self.timeOutSeconds, 'request time out');
-
-    return reqPromise;
 };
-
 
 var removeMsg = function (receiptHandle) {
     var self = this,
