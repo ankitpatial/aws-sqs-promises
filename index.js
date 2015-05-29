@@ -151,8 +151,7 @@ SimpleQueue.prototype.receiveMessage = function () {
     var self = this,
         sqs = self.client;
 
-    return Q.timeout(Q.Promise(function (resolve, reject) {
-        console.time(scriptName + 'receiveMessage');
+    var reqPromise = Q.Promise(function (resolve, reject) {
         self.getQueueUrl()
             .then(function (queueUrl) {
                 var params = {
@@ -165,14 +164,18 @@ SimpleQueue.prototype.receiveMessage = function () {
                     if (err) {
                         reject(err);
                     } else {
-                        console.timeEnd(scriptName + 'receiveMessage');
                         resolve(data.Messages);
                     }
                 });
             })
             .catch(reject);
-    }), 1000 * self.timeOutSeconds, 'request time out');
+    });
+
+    Q.timeout(reqPromise, 1000 * self.timeOutSeconds, 'request time out');
+
+    return reqPromise;
 };
+
 
 var removeMsg = function (receiptHandle) {
     var self = this,
