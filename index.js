@@ -50,7 +50,7 @@ function SimpleQueue(options) {
 
 
     if (options.useIAMRole) {
-        logger.log('Use IAMRole');
+        logger.log(this.name + ' use IAMRole');
         this.client = new AWS.SQS({
             region: options.region || "us-east-1",
             apiVersion: options.apiVersion || '2012-11-05'
@@ -64,51 +64,29 @@ function SimpleQueue(options) {
         });
     }
 
-    this._getUrlState = {
-        count: 0,
-        isBusy: false,
-        waitQueue: []
-    };
+    this.getQueueUrl();
 }
 
 module.exports = SimpleQueue;
 
 SimpleQueue.prototype.getQueueUrl = function () {
-    var deferred = Q.defer(),
-        self = this,
-        handleRes = function (err, data) {
+    var self = this;
+    return Q.Promise(function (resolve, reject) {
+
+        if (self.queueUrl) {
+            return resolve(self.queueUrl);
+        }
+
+        self.client.getQueueUrl({QueueName: self.name}, function (err, data) {
             if (err) {
                 var errMsg = 'Code: ' + (err.code || 'N/A' ) + '. Message: ' + (err.message || err);
                 logger.error(errMsg);
-                self._getUrlState.waitQueue.forEach(function (df) {
-                    df.reject(err);
-                });
-
-            } else {
-                self.queueUrl = data.QueueUrl;
-                self._getUrlState.waitQueue.forEach(function (df) {
-                    df.resolve(self.queueUrl);
-                });
+                return reject(errMsg);
             }
-        };
-
-    if (!self.queueUrl) {
-
-        // put current promise to wait queue
-        self._getUrlState.waitQueue.push(deferred);
-
-        // we don't have queue url, fetch it
-        if (!self._getUrlState.isBusy) {
-            self._getUrlState.isBusy = true;
-            self._getUrlState.count += 1;
-            self.client.getQueueUrl({QueueName: self.name}, handleRes);
-        }
-
-    } else { // we already have queue url, send it.
-        deferred.resolve(self.queueUrl);
-    }
-
-    return deferred.promise;
+            self.queueUrl = data.QueueUrl;
+            resolve(self.queueUrl);
+        });
+    });
 };
 
 SimpleQueue.prototype.getQueueAttributes = function () {

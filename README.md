@@ -44,6 +44,9 @@ myQueue
 ### Change set
  Change list.
 
+#### 0.1.4
+- code refactoring
+
 #### 0.1.1
 - added new params delaySeconds
  ```
