@@ -3,7 +3,7 @@ var AWS = require('aws-sdk'),
     Q = require('q'),
     assert = require('assert');
 
-var scriptName = '[aws-sqs-promises] ';
+var scriptName = process.pid + ' - [aws-sqs-promises] ';
 
 var logger = {
     log: function (msg) {

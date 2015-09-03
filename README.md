@@ -44,6 +44,9 @@ myQueue
 ### Change set
  Change list.
 
+#### 0.1.2 - 0.1.8 
+- prefix logs with process.pid
+
 #### 0.1.2 - 0.1.7 
 - code refactoring
 
